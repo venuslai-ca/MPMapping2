@@ -23,29 +23,19 @@ ul{list-style:none;margin:0 0 10px;padding:0}li{display:grid;grid-template-colum
 #ans{margin:8px 0 0;font-size:13px}#dt p{margin:3px 0;font-size:13px}.lg2{font-size:12px;color:var(--mu);margin-top:8px}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:10px}.bl{list-style:disc;padding-left:18px;margin:6px 0 0}.bl li{display:list-item;cursor:auto;font-size:13px;padding:1px 0}nav{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 0;font-size:13px}nav a{color:var(--g)}h2{scroll-margin-top:8px}</style></head><body><noscript><p style="padding:16px">This dashboard needs JavaScript enabled.</p></noscript>
 <main>
-<h1>FSA Ad Performance Dashboard</h1><p class="m" style="margin:2px 0">Project brief and working mockup, prepared for discussion</p><nav><a href="#brief">Brief</a><a href="#flow">Workflow</a><a href="#dash">Dashboard</a><a href="#ask">Questions for discussion</a></nav>
+<h1>FSA Ad Performance Dashboard</h1><p class="m" style="margin:2px 0">Project brief and working mockup, prepared for discussion</p><nav><a href="#brief">Brief</a><a href="#dash">Dashboard</a><a href="#ask">Questions for discussion</a></nav>
 <p class="m">Source: Bayer_CropScience_FSA_data.xlsx · 3 campaigns · 279 FSA-campaign rows · 141 FSAs · impressions, clicks, CTR only.</p>
 
 <h2 id="brief">1 · Brief</h2>
 <div class="g2">
 <div class="cd"><h3>Objective</h3><p class="m" style="margin:0">Turn FSA-level ad performance into map-based guidance for regional media allocation: where response is strong or weak against a chosen benchmark, and what to do about it.</p></div>
 <div class="cd"><h3>Context</h3><ul class="bl"><li>Client and agency as named in the original FSA-Based Ad Performance Database concept (Aug 12, 2026).</li><li>Farmer audiences are geo-bounded: local crop, weather, soil and retailer conditions make location a stronger signal than demographics.</li></ul></div>
-<div class="cd"><h3>Data in hand</h3><ul class="bl"><li>3 tabs, 279 FSA-campaign rows, 141 FSAs, 10.4M impressions, 193.8K clicks.</li><li>Battle of the Bushels (Seed), Win-Win and No Flex TruFlex (Traits); Alberta, Saskatchewan, Manitoba plus 3 BC FSAs.</li><li>Fields: FSA, Province, Portfolio, Campaign, Impressions, Clicks, CTR.</li><li>Not yet available: date, channel, creative, spend, revenue.</li></ul></div>
+<div class="cd"><h3>Data in hand</h3><ul class="bl"><li>3 tabs, 279 FSA-campaign rows, 141 FSAs, 10.4M impressions, 193.8K clicks.</li><li>Battle of the Bushels (Seed), Win-Win and No Flex TruFlex (Traits); Alberta, Saskatchewan, Manitoba plus 3 BC FSAs.</li><li>Fields: FSA, Province, Portfolio, Campaign, Impressions, Clicks, CTR.</li><li>Not yet available: date, channel, creative, spend, revenue.</li><li>Data quality: 3 BC FSAs (V1G, V0C, V1J) sit outside the Prairies; 36 rows have under 5,000 impressions; 21 zero-delivery rows are set to no CTR.</li></ul></div>
 <div class="cd"><h3>Phases</h3><ul class="bl"><li><b>1 · Now:</b> cleaned dataset and interactive map on impressions, clicks, CTR.</li><li><b>2 · Next:</b> Q&amp;A assistant grounded in dashboard data only.</li><li><b>3 · Later:</b> spend, channel, trend and sales/CRM linkage.</li></ul></div>
 <div class="cd"><h3>Benchmark logic</h3><ul class="bl"><li>Planner picks national or province average, calculated per campaign so Seed and Traits are never blended.</li><li>Index = actual clicks ÷ clicks expected at the benchmark CTR.</li><li>Low-volume FSAs (default under 5,000 impressions) are flagged, and judgement is held.</li></ul></div>
 <div class="cd"><h3>Guardrails</h3><ul class="bl"><li>CTR measures engagement, not sales; no causal claims.</li><li>Respect platform privacy thresholds; aggregated, non-personal data only.</li><li>FSA points are representative locations; rural FSAs cover large areas.</li></ul></div>
 </div>
-<h2 id="flow">2 · Workflow: from source to answer</h2>
-<div class="st">
-<div class="cd"><b>1 Ingest</b><p>3 tabs, 2 layouts. Master tab reconciles exactly to the Win Win and No Flex TruFlex tabs.</p></div>
-<div class="cd"><b>2 Clean</b><p>FSA parsed from “R1A, Manitoba, Canada”. 21 zero-delivery rows with “--” CTR set to null. “Win Win” becomes “Win-Win”.</p></div>
-<div class="cd"><b>3 Standardize</b><p>One table: FSA, Province, Portfolio, Campaign, Impressions, Clicks, CTR (recomputed; 0 mismatches).</p></div>
-<div class="cd"><b>4 Analyze</b><p>CTR index vs a chosen benchmark: national or province average per campaign. Low-volume and out-of-scope BC flags.</p></div>
-<div class="cd"><b>5 Respond</b><p>Map dashboard now. Q&amp;A assistant next. Sales and revenue link once data arrives.</p></div>
-</div>
-<p class="lg2">Data-quality log: 3 BC FSAs (V1G, V0C, V1J) sit outside the Prairies · 36 rows under 5,000 impressions · no date, channel, creative or spend fields yet, so trend, channel and cost views are held for the next data drop.</p>
-
-<h2 id="dash">3 · Dashboard <small style="text-transform:none;letter-spacing:0">(hover a bubble for benchmark detail)</small></h2>
+<h2 id="dash">2 · Dashboard <small style="text-transform:none;letter-spacing:0">(hover a bubble for benchmark detail)</small></h2>
 <div class="bar">
 <select id="c" onchange="draw()"><option value="-1">All campaigns</option><option value="0">Battle of the Bushels (Seed)</option><option value="1">Win-Win (Traits)</option><option value="2">No Flex TruFlex (Traits)</option></select>
 <select id="p" onchange="draw()"><option value="-1">All provinces</option><option value="0">Alberta</option><option value="1">Saskatchewan</option><option value="2">Manitoba</option><option value="3">British Columbia</option></select>
@@ -65,7 +55,7 @@ ul{list-style:none;margin:0 0 10px;padding:0}li{display:grid;grid-template-colum
 <p id="ans" class="m">Answers use the filters above.</p></div>
 </div></div>
 <p class="lg2">Index = clicks ÷ clicks expected at the benchmark CTR of the same campaign (national or province), so Seed and Traits compare fairly. Points mark one representative location per FSA; rural FSAs cover far larger areas, and an FSA boundary file would shade them properly. Province outlines: Natural Earth. FSA points: GeoNames via postalcodes-ca (CC BY 4.0).</p>
-<h2 id="ask">4 · Questions for discussion</h2>
+<h2 id="ask">3 · Questions for discussion</h2>
 <div class="cd"><ul class="bl"><li>Can partners supply date, channel, creative version and spend by FSA, so trend and cost views can follow?</li><li>Is an FSA boundary file available, so the map can shade true regions instead of points?</li><li>Is there a target CTR, or a privacy threshold from Google, MiQ and Clue Digital that should drive suppression?</li><li>Which platform will host this: Power BI or a web app, and who gets access?</li><li>When should the Q&amp;A assistant (Phase 2) start, and which questions should it decline?</li></ul></div>
 </main><div id="tp"></div>
 <script>
