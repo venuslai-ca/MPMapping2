@@ -45,7 +45,7 @@ ul{list-style:none;margin:0 0 10px;padding:0}li{display:grid;grid-template-colum
 </div>
 <div class="q" id="kp"></div>
 <div class="gr">
-<div class="cd"><div class="zc"><button id="zo" aria-label="Zoom out">−</button><input type="range" id="zs" min="1" max="10" step="0.1" value="1" aria-label="Map zoom"><button id="zi" aria-label="Zoom in">+</button><span id="zv">1.0×</span><button id="zr">Reset</button></div><svg id="map" role="img" aria-label="Canada map with FSA performance bubbles"></svg>
+<div class="cd"><div class="zc"><button id="zo" aria-label="Zoom out">−</button><input type="range" id="zs" min="1" max="20" step="0.1" value="1" aria-label="Map zoom"><button id="zi" aria-label="Zoom in">+</button><span id="zv">1.0×</span><button id="zr">Reset</button></div><svg id="map" role="img" aria-label="Canada map with FSA performance bubbles"></svg>
 <div class="lg"><span style="--c:var(--g)">Strong ≥1.10× benchmark</span><span style="--c:var(--y)">On par</span><span style="--c:var(--r)">Weak &lt;0.90×</span><span style="--c:transparent">No delivery</span><span class="ns">Size = impressions · faded = below volume filter · drag to pan, pinch or slide to zoom</span></div></div>
 <div>
 <div class="cd"><h3>Strongest FSAs (CTR index)</h3><ul id="top"></ul><h3>Weakest FSAs</h3><ul id="bot"></ul></div>
@@ -106,7 +106,7 @@ $('map').addEventListener('pointermove',e=>{if(moved)return;const c=e.target.clo
  tp.style.left=Math.min(e.clientX+14,innerWidth-tp.offsetWidth-8)+'px';tp.style.top=Math.max(8,Math.min(e.clientY+14,innerHeight-tp.offsetHeight-8))+'px'});
 $('map').addEventListener('pointerleave',()=>tp.style.display='none');
 function showTip(o,x,y){tp.innerHTML=tip(o);tp.style.display='block';tp.style.left=Math.max(8,Math.min(x+14,innerWidth-tp.offsetWidth-8))+'px';tp.style.top=Math.max(8,Math.min(y+14,innerHeight-tp.offsetHeight-8))+'px'}
-const setZ=v=>{zm=Math.max(1,Math.min(10,v));draw()},M=$('map'),ptrs=new Map();let d0=1,z0=1;
+const setZ=v=>{zm=Math.max(1,Math.min(20,v));draw()},M=$('map'),ptrs=new Map();let d0=1,z0=1;
 $('zs').oninput=e=>setZ(+e.target.value);$('zi').onclick=()=>setZ(zm*1.5);$('zo').onclick=()=>setZ(zm/1.5);$('zr').onclick=()=>{pan=[0,0];setZ(1)};
 M.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,[e.clientX,e.clientY]);moved=false;if(ptrs.size==2){const[a,b]=[...ptrs.values()];d0=Math.hypot(a[0]-b[0],a[1]-b[1])||1;z0=zm}});
 M.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;
