@@ -21,7 +21,7 @@ svg{width:100%;height:auto}.t{font-weight:600;font-size:13px;fill:var(--tx)}#tp{
 ul{list-style:none;margin:0 0 10px;padding:0}li{display:grid;grid-template-columns:42px 1fr 48px;gap:8px;align-items:center;font-size:13px;cursor:pointer;padding:2px 0}li i{height:8px;border-radius:4px}li em{font-style:normal;text-align:right}
 .lg{font-size:12px;color:var(--mu);display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}.lg span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--c);margin-right:5px;border:1px solid var(--mu)}
 #ans{margin:8px 0 0;font-size:13px}#dt p{margin:3px 0;font-size:13px}.lg2{font-size:12px;color:var(--mu);margin-top:8px}
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:10px}.bl{list-style:disc;padding-left:18px;margin:6px 0 0}.bl li{display:list-item;cursor:auto;font-size:13px;padding:1px 0}nav{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 0;font-size:13px}nav a{color:var(--g)}h2{scroll-margin-top:8px}</style></head><body><noscript><p style="padding:16px">This dashboard needs JavaScript enabled.</p></noscript>
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:10px}.bl{list-style:disc;padding-left:18px;margin:6px 0 0}.bl li{display:list-item;cursor:auto;font-size:13px;padding:1px 0}nav{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 0;font-size:13px}nav a{color:var(--g)}h2{scroll-margin-top:8px}.zc{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px}.zc input{flex:1;min-width:0}.zc button{padding:4px 12px}.zc span{min-width:34px;text-align:right}#map{touch-action:pan-y;user-select:none;-webkit-user-select:none}</style></head><body><noscript><p style="padding:16px">This dashboard needs JavaScript enabled.</p></noscript>
 <main>
 <h1>FSA Ad Performance Dashboard</h1><p class="m" style="margin:2px 0">Project brief and working mockup, prepared for discussion</p><nav><a href="#brief">Brief</a><a href="#dash">Dashboard</a><a href="#ask">Questions for discussion</a></nav>
 <p class="m">Source: Bayer_CropScience_FSA_data.xlsx · 3 campaigns · 279 FSA-campaign rows · 141 FSAs · impressions, clicks, CTR only.</p>
@@ -45,8 +45,8 @@ ul{list-style:none;margin:0 0 10px;padding:0}li{display:grid;grid-template-colum
 </div>
 <div class="q" id="kp"></div>
 <div class="gr">
-<div class="cd"><svg id="map" role="img" aria-label="Canada map with FSA performance bubbles"></svg>
-<div class="lg"><span style="--c:var(--g)">Strong ≥1.10× benchmark</span><span style="--c:var(--y)">On par</span><span style="--c:var(--r)">Weak &lt;0.90×</span><span style="--c:transparent">No delivery</span><span class="ns">Size = impressions · faded = below volume filter</span></div></div>
+<div class="cd"><div class="zc"><button id="zo" aria-label="Zoom out">−</button><input type="range" id="zs" min="1" max="10" step="0.1" value="1" aria-label="Map zoom"><button id="zi" aria-label="Zoom in">+</button><span id="zv">1.0×</span><button id="zr">Reset</button></div><svg id="map" role="img" aria-label="Canada map with FSA performance bubbles"></svg>
+<div class="lg"><span style="--c:var(--g)">Strong ≥1.10× benchmark</span><span style="--c:var(--y)">On par</span><span style="--c:var(--r)">Weak &lt;0.90×</span><span style="--c:transparent">No delivery</span><span class="ns">Size = impressions · faded = below volume filter · drag to pan, pinch or slide to zoom</span></div></div>
 <div>
 <div class="cd"><h3>Strongest FSAs (CTR index)</h3><ul id="top"></ul><h3>Weakest FSAs</h3><ul id="bot"></ul></div>
 <div class="cd" style="margin-top:12px" id="dt"></div>
@@ -65,7 +65,7 @@ const avg=C.map((_,i)=>{let a=0,b=0;D.forEach(r=>r[2]==i&&(a+=r[3],b+=r[4]));ret
 const pa=C.map((_,c)=>P.map((_,p)=>{let a=0,b=0;D.forEach(r=>r[2]==c&&r[1]==p&&(a+=r[3],b+=r[4]));return a?b/a:avg[c]}));
 const bench=(c,p)=>$('b').value=='p'?pa[c][p]:avg[c];
 const $=id=>document.getElementById(id),n=x=>x.toLocaleString('en-CA'),pc=x=>(x*100).toFixed(2)+'%';
-let sel=null,L=[],R=[];
+let sel=null,L=[],R=[],zm=1,pan=[0,0],lk='',moved=false;
 function agg(){const c=+$('c').value,p=+$('p').value,m={};
  D.forEach(r=>{if((c<0||r[2]==c)&&(p<0||r[1]==p)){const o=m[r[0]]||(m[r[0]]={f:r[0],p:r[1],i:0,k:0,e:0,r:[]});o.i+=r[3];o.k+=r[4];o.e+=r[3]*bench(r[2],r[1]);o.r.push(r)}});
  return Object.values(m).map(o=>(o.x=o.e?o.k/o.e:null,o))}
@@ -76,12 +76,15 @@ function draw(){L=agg();const min=+$('m').value;
  const mx=Math.max(...L.map(o=>o.i),1),pts=L.map(o=>G.xy[o.f]);let vx=0,vy=0,vw=1000,vh=G.H;
  if($('z').value=='f'&&pts.length){const xs=pts.map(q=>q[0]),ys=pts.map(q=>q[1]),x0=Math.min(...xs)-25,x1=Math.max(...xs)+25,y0=Math.min(...ys)-25,y1=Math.max(...ys)+25;
   vw=Math.max(x1-x0,(y1-y0)*1.25);vh=vw/1.25;vx=(x0+x1)/2-vw/2;vy=(y0+y1)/2-vh/2}
- const k=vw/1000,have=new Set(L.map(o=>o.p));
+ const key=$('c').value+$('p').value+$('z').value;if(key!=lk){lk=key;zm=1;pan=[0,0]}
+ const bw=vw,bh=vh,zw=bw/zm,zh=bh/zm;pan[0]=Math.max(-(bw-zw)/2,Math.min((bw-zw)/2,pan[0]));pan[1]=Math.max(-(bh-zh)/2,Math.min((bh-zh)/2,pan[1]));
+ vx+=(bw-zw)/2+pan[0];vy+=(bh-zh)/2+pan[1];vw=zw;vh=zh;
+ const k=vw/1000,mb=Math.max(1,700/($('map').clientWidth||700)),have=new Set(L.map(o=>o.p));
  let h=G.prov.map(q=>`<path class="pv" d="${q.d}"/>`).join('');
  G.prov.forEach(q=>{if($('z').value=='c'||['AB','SK','MB','BC'].includes(q.n))h+=`<text class="pl" x="${q.c[0]}" y="${q.c[1]}" style="font-size:${11*k}px">${q.n}</text>`});
  L.slice().sort((a,b)=>b.i-a.i).forEach(o=>{const q=G.xy[o.f],low=o.i&&o.i<min;
-  h+=`<circle data-f="${o.f}" cx="${q[0]}" cy="${q[1]}" r="${(o.i?3+9*Math.sqrt(o.i/mx):3)*k}" fill="${col(o.x)}" fill-opacity="${low?0.35:0.8}" stroke="${o.f==sel?'var(--tx)':'var(--mu)'}" stroke-width="${o.f==sel?2.5:0.7}" style="cursor:pointer"${o.i?'':' stroke-dasharray="2 2"'}/>`});
- $('map').setAttribute('viewBox',`${vx} ${vy} ${vw} ${vh}`);$('map').innerHTML=h;
+  h+=`<circle data-f="${o.f}" cx="${q[0]}" cy="${q[1]}" r="${(o.i?3+9*Math.sqrt(o.i/mx):3)*k*mb}" fill="${col(o.x)}" fill-opacity="${low?0.35:0.8}" stroke="${o.f==sel?'var(--tx)':'var(--mu)'}" stroke-width="${o.f==sel?2.5:0.7}" style="cursor:pointer"${o.i?'':' stroke-dasharray="2 2"'}/>`});
+ $('map').setAttribute('viewBox',`${vx} ${vy} ${vw} ${vh}`);$('map').innerHTML=h;$('zs').value=zm;$('zv').textContent=zm.toFixed(1)+'×';$('map').style.cursor=zm>1?'grab':'default';$('map').style.touchAction=zm>1?'none':'pan-y';
  R=L.filter(o=>o.i>=Math.max(min,1)&&o.x!=null).sort((a,b)=>b.x-a.x);
  const li=o=>`<li data-f="${o.f}"><span>${o.f}</span><i style="width:${Math.min(o.x/1.6*100,100)}%;background:${col(o.x)}"></i><em>${o.x.toFixed(2)}×</em></li>`;
  $('top').innerHTML=R.slice(0,5).map(li).join('');$('bot').innerHTML=R.slice(-5).reverse().map(li).join('');
@@ -98,10 +101,20 @@ function tip(o){const lv=+$('m').value||5000,bn=$('b').value=='p'?'province':'na
  let h=`<b>${o.f}</b> · ${P[o.p]}`+(o.i?`<p>${n(o.i)} imp · ${n(o.k)} clicks · CTR <b>${pc(o.k/o.i)}</b></p><p>vs ${bn} benchmark ${pc(o.e/o.i)}: <b style="color:${col(o.x)}">${o.x.toFixed(2)}×</b> (${(o.k-o.e>=0?'+':'')}${((o.k-o.e)/o.i*100).toFixed(2)} pts)</p>`:'<p>No delivery</p>');
  o.r.forEach(r=>{h+=`<p class="m">${C[r[2]]}: ${r[3]?pc(r[4]/r[3]):'--'} vs ${pc(bench(r[2],r[1]))}</p>`});
  return h+`<p><b>${!o.i?'Check delivery and targeting':o.i<lv?'Low volume: hold judgement':o.x>=1.1?'Signal: lean in, test more budget':o.x<.9?'Signal: review creative or targeting':'Signal: on par, hold'}</b></p>`}
-$('map').addEventListener('pointermove',e=>{const c=e.target.closest('circle[data-f]'),o=c&&L.find(x=>x.f==c.dataset.f);
+$('map').addEventListener('pointermove',e=>{if(moved)return;const c=e.target.closest('circle[data-f]'),o=c&&L.find(x=>x.f==c.dataset.f);
  if(!o){tp.style.display='none';return}tp.innerHTML=tip(o);tp.style.display='block';
  tp.style.left=Math.min(e.clientX+14,innerWidth-tp.offsetWidth-8)+'px';tp.style.top=Math.max(8,Math.min(e.clientY+14,innerHeight-tp.offsetHeight-8))+'px'});
 $('map').addEventListener('pointerleave',()=>tp.style.display='none');
-document.addEventListener('click',e=>{const g=e.target.closest('[data-f]');if(g){sel=g.dataset.f;draw()}});
+function showTip(o,x,y){tp.innerHTML=tip(o);tp.style.display='block';tp.style.left=Math.max(8,Math.min(x+14,innerWidth-tp.offsetWidth-8))+'px';tp.style.top=Math.max(8,Math.min(y+14,innerHeight-tp.offsetHeight-8))+'px'}
+const setZ=v=>{zm=Math.max(1,Math.min(10,v));draw()},M=$('map'),ptrs=new Map();let d0=1,z0=1;
+$('zs').oninput=e=>setZ(+e.target.value);$('zi').onclick=()=>setZ(zm*1.5);$('zo').onclick=()=>setZ(zm/1.5);$('zr').onclick=()=>{pan=[0,0];setZ(1)};
+M.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,[e.clientX,e.clientY]);moved=false;if(ptrs.size==2){const[a,b]=[...ptrs.values()];d0=Math.hypot(a[0]-b[0],a[1]-b[1])||1;z0=zm}});
+M.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;
+ if(ptrs.size==2){ptrs.set(e.pointerId,[e.clientX,e.clientY]);const[a,b]=[...ptrs.values()];moved=true;setZ(z0*Math.hypot(a[0]-b[0],a[1]-b[1])/d0);return}
+ const dx=e.clientX-p[0],dy=e.clientY-p[1];
+ if(zm>1&&(moved||Math.abs(dx)+Math.abs(dy)>4)){moved=true;const r=M.getBoundingClientRect(),vb=M.viewBox.baseVal;pan[0]-=dx*vb.width/r.width;pan[1]-=dy*vb.height/r.height;ptrs.set(e.pointerId,[e.clientX,e.clientY]);tp.style.display='none';draw()}});
+['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,e=>{ptrs.delete(e.pointerId);setTimeout(()=>moved=false,0)}));
+document.addEventListener('click',e=>{if(moved)return;const g=e.target.closest('[data-f]');
+ if(g){sel=g.dataset.f;const c=g.tagName=='circle';draw();const o=L.find(x=>x.f==sel);if(c&&o)showTip(o,e.clientX,e.clientY)}else if(!e.target.closest('#tp'))tp.style.display='none'});
 draw();
 </script></body></html>
