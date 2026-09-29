@@ -105,5 +105,5 @@ M.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;
  if(zm>1&&(moved||Math.abs(dx)+Math.abs(dy)>4)){moved=true;const r=M.getBoundingClientRect(),vb=M.viewBox.baseVal;pan[0]-=dx*vb.width/r.width;pan[1]-=dy*vb.height/r.height;ptrs.set(e.pointerId,[e.clientX,e.clientY]);tp.style.display='none';draw()}});
 ['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,e=>{ptrs.delete(e.pointerId);setTimeout(()=>moved=false,0)}));
 document.addEventListener('click',e=>{if(moved)return;const g=e.target.closest('[data-f]');
- if(g){sel=g.dataset.f;const c=g.tagName=='circle';draw();const o=L.find(x=>x.f==sel);if(c&&o)showTip(o,e.clientX,e.clientY)}else if(!e.target.closest('#tp'))tp.style.display='none'});draw()
+ if(g){sel=g.dataset.f;const c=g.tagName=='circle';draw();const o=L.find(x=>x.f==sel);if(c&&o)showTip(o,e.clientX,e.clientY)}else if(!e.target.closest('#tp'))tp.style.display='none'})
 </script></body></html>
